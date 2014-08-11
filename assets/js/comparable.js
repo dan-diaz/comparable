@@ -8,11 +8,15 @@ var comparable = (function() {
         var holders = document.querySelectorAll(selector);
 
         Array.prototype.forEach.call(holders, function(holder) {
-            var compareA = holder.dataset.compareA;
-            var compareB = holder.dataset.compareB;
-            var slider = createImg(compareA,compareB, holder);
-            if(slider.children.length === 1) { // need to error proof this!
-                mouseEvents(slider, holder);
+            var compareA = holder.dataset&&holder.dataset.compareA?holder.dataset.compareA:null;
+            var compareB = holder.dataset&&holder.dataset.compareB?holder.dataset.compareB:null;
+            if(compareA === null || compareB === null) {
+                return false;
+            } else {
+                var slider = createImg(compareA,compareB, holder);
+                if(slider.children.length) {
+                    mouseEvents(slider, holder);
+                }
             }
         });
     }
@@ -63,26 +67,28 @@ var comparable = (function() {
             compB.appendChild(compBSlider);
             compBSlider.appendChild(imgB);
 
+            // return the element so we can apply events
             return compB;
         } else {
-            return 'incorrect number of data attributes.';
+            return false;
         }
     }
 
     function mouseEvents(slider, holder) {
         slider.addEventListener('mouseenter', function(evt) {
             evt.target.addEventListener('mousemove', function(e) {
-                mouseX(e, slider, holder)
+                mouseX(e, slider, holder);
             });
         });
         slider.addEventListener('mouseleave', function(evt) {
             evt.target.removeEventListener('mousemove', function(e) {
-                mouseX(e, slider, holder)
+                mouseX(e, slider, holder);
             });
         });
     }
 
     function mouseX(e, slider, holder) {
+        // set slider width to x coordinate minus left offset of holder element
         slider.children[0].style.width = e.clientX - holder.offsetLeft + 'px';
     }
 
