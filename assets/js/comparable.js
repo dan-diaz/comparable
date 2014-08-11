@@ -15,7 +15,7 @@ var comparable = (function() {
             } else {
                 var slider = createImg(compareA,compareB, holder);
                 if(slider.children.length) {
-                    mouseEvents(slider, holder);
+                    userEvents(slider, holder);
                 }
             }
         });
@@ -23,7 +23,7 @@ var comparable = (function() {
 
     // set initial img attributes and styles
     function createImg(a, b, holder) {
-        if(a !== '' && b !== '') {
+        if(a!=='' && b!=='') {
             var compA = document.createElement('div');
             var compB = document.createElement('div');
             var compBSlider = document.createElement('div');
@@ -74,22 +74,35 @@ var comparable = (function() {
         }
     }
 
-    function mouseEvents(slider, holder) {
+    function userEvents(slider, holder) {
         slider.addEventListener('mouseenter', function(evt) {
             evt.target.addEventListener('mousemove', function(e) {
-                mouseX(e, slider, holder);
+                eventX(e, slider, holder);
             });
         });
+
         slider.addEventListener('mouseleave', function(evt) {
             evt.target.removeEventListener('mousemove', function(e) {
-                mouseX(e, slider, holder);
+                eventX(e, slider, holder);
+            });
+        });
+
+        slider.addEventListener('touchstart', function(evt) {
+            evt.target.addEventListener('touchmove', function(e) {
+                eventX(e, slider, holder);
+            });
+        });
+        slider.addEventListener('touchend', function(evt) {
+            evt.target.removeEventListener('touchmove', function(e) {
+                eventX(e, slider, holder);
             });
         });
     }
 
-    function mouseX(e, slider, holder) {
-        // set slider width to x coordinate minus left offset of holder element
-        slider.children[0].style.width = e.clientX - holder.offsetLeft + 'px';
+    function eventX(e, slider, holder) {
+        var clientX = e.touches?e.touches[0].clientX:e.clientX;
+
+        slider.children[0].style.width = clientX - holder.offsetLeft + 'px';
     }
 
     return {
