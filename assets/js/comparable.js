@@ -89,4 +89,4 @@ var comparable = (function() {
     return {
         compare:compare
     }
-})();
+})();// test
