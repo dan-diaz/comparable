@@ -4,8 +4,11 @@
 // dan-diaz.com
 var comparable = (function() {
 
-    function compare(selector) {
+    function compare(selector, settings) {
         var holders = document.querySelectorAll(selector);
+        var opts = {};
+        opts.split = settings&&settings.split?settings.split:0.5;
+        opts.splitReturn = settings&&settings.splitReturn?settings.splitReturn:false;
 
         Array.prototype.forEach.call(holders, function(holder) {
             var compareA = holder.dataset&&holder.dataset.compareA?holder.dataset.compareA:null;
@@ -13,16 +16,16 @@ var comparable = (function() {
             if(compareA === null || compareB === null) {
                 return false;
             } else {
-                var slider = createImg(compareA,compareB, holder);
+                var slider = createImg(compareA,compareB, holder, opts);
                 if(slider.children.length) {
-                    userEvents(slider, holder);
+                    userEvents(slider, holder, opts);
                 }
             }
         });
     }
 
     // set initial img attributes and styles
-    function createImg(a, b, holder) {
+    function createImg(a, b, holder, opts) {
         if(a!=='' && b!=='') {
             var compA = document.createElement('div');
             var compB = document.createElement('div');
@@ -33,6 +36,7 @@ var comparable = (function() {
             var zIndexB = zIndexA + 1;
 
             holder.style.position = 'relative';
+
             // Element-A is the static background element
             compA.classList.add('compare','compare-a');
             compA.style.zIndex = zIndexA;
@@ -51,7 +55,7 @@ var comparable = (function() {
             // Element-B inner slider
             compBSlider.classList.add('compare-b-slider');
             compBSlider.style.position = 'absolute';
-            compBSlider.style.width = '50%';
+            compBSlider.style.width = 100*opts.split + '%';
             compBSlider.style.overflow = 'hidden';
 
             // image A - background image
@@ -67,6 +71,11 @@ var comparable = (function() {
             compB.appendChild(compBSlider);
             compBSlider.appendChild(imgB);
 
+            // apply image width to holder
+            imgA.addEventListener('load', function() {
+                holder.style.width = imgA.scrollWidth + 'px';
+            })
+
             // return the element so we can apply events
             return compB;
         } else {
@@ -74,7 +83,7 @@ var comparable = (function() {
         }
     }
 
-    function userEvents(slider, holder) {
+    function userEvents(slider, holder, opts) {
         slider.addEventListener('mouseenter', function(evt) {
             evt.target.addEventListener('mousemove', function(e) {
                 eventX(e, slider, holder);
@@ -85,6 +94,9 @@ var comparable = (function() {
             evt.target.removeEventListener('mousemove', function(e) {
                 eventX(e, slider, holder);
             });
+            if(opts.splitReturn) {
+                slider.children[0].style.width = 100*opts.split + '%';
+            }
         });
 
         slider.addEventListener('touchstart', function(evt) {
@@ -96,6 +108,9 @@ var comparable = (function() {
             evt.target.removeEventListener('touchmove', function(e) {
                 eventX(e, slider, holder);
             });
+            if(opts.splitReturn) {
+                slider.children[0].style.width = 100*opts.split + '%';
+            }
         });
     }
 

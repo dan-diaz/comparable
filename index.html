@@ -4,11 +4,13 @@
 </head>
 <body>
 <div class="comparable" data-compare-a="assets/img/image-a.jpg" data-compare-b="assets/img/image-b.jpg"></div>
-<div class="comparable" data-compare-a="assets/img/image-a.jpg" data-compare-b="assets/img/image-b.jpg"></div>
+<div id="comparable" data-compare-a="assets/img/image-a.jpg" data-compare-b="assets/img/image-b.jpg"></div>
 <!-- <div class="comparable" data-compare-a="" data-compare-b="assets/img/image-b.jpg"></div> -->
 <script src="assets/js/comparable.js"></script>
 <script>
-comparable.compare('.comparable');
+comparable.compare('.comparable', {
+    splitReturn:true
+});
 </script>
 </body>
 </html>
