@@ -3,13 +3,15 @@
 <head>
 </head>
 <body>
-<div class="comparable" data-compare-a="assets/img/image-a.jpg" data-compare-b="assets/img/image-b.jpg"></div>
-<div id="comparable" data-compare-a="assets/img/image-a.jpg" data-compare-b="assets/img/image-b.jpg"></div>
-<!-- <div class="comparable" data-compare-a="" data-compare-b="assets/img/image-b.jpg"></div> -->
+<!-- <div class="comparable" data-compare-a="assets/img/image-a.jpg" data-compare-b="assets/img/image-b.jpg"></div> -->
+<div class="comparable"></div>
+<div class="comparable"></div>
+<div class="comparable"></div>
 <script src="assets/js/comparable.js"></script>
 <script>
 comparable.compare('.comparable', {
-    splitReturn:true
+    imageB:'assets/img/image-a.jpg',
+    imageA:'assets/img/image-b.jpg'
 });
 </script>
 </body>
