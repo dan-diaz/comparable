@@ -7,16 +7,12 @@ var comparable = (function() {
     function compare(selector, settings) {
         var holders = document.querySelectorAll(selector);
         var opts = {};
-        opts.split = settings&&settings.split?settings.split:0.5;
+        opts.split = settings&&settings.split!==null?settings.split:0.5;
         opts.splitReturn = settings&&settings.splitReturn?settings.splitReturn:false;
         opts.imageA = settings&&settings.imageA?settings.imageA:null;
         opts.imageB = settings&&settings.imageB?settings.imageB:null;
 
-        for(var i=0;i<holders.length;i++) {
-            eachHolder(holders[i]);
-        }
-        // Array.prototype.forEach.call(holders, function(holder) { // forEach not supported in IE8
-        function eachHolder(holder) {
+        Array.prototype.forEach.call(holders, function(holder) {
             var compareA;
             var compareB;
 
@@ -36,7 +32,6 @@ var comparable = (function() {
                 compareB = null;
             }
 
-            // var compareB = holder.dataset&&holder.dataset.compareB?holder.dataset.compareB:null;
             if(compareA === null || compareB === null) {
                 return false;
             } else {
@@ -45,7 +40,7 @@ var comparable = (function() {
                     userEvents(slider, holder, opts);
                 }
             }
-        }
+        });
     }
 
     // set initial img attributes and styles
@@ -80,7 +75,8 @@ var comparable = (function() {
             // Element-B inner slider
             compBSlider.className ='compare-b-slider';
             compBSlider.style.position = 'absolute';
-            compBSlider.style.width = (100*opts.split) + '%';
+            // compBSlider.style.width = (100*opts.split) + '%';
+            split(compBSlider,opts.split);
             compBSlider.style.overflow = 'hidden';
 
             // image A - background image
@@ -108,41 +104,35 @@ var comparable = (function() {
         }
     }
 
+    // mouse and touch events
     function userEvents(slider, holder, opts) {
-        slider.addEventListener('mouseenter', function(evt) {
-            evt.target.addEventListener('mousemove', function(e) {
-                eventX(e, slider, holder);
-            });
+        slider.addEventListener('mousemove', function(e) {
+            eventX(e, slider, holder);
         });
 
-        slider.addEventListener('mouseleave', function(evt) {
-            evt.target.removeEventListener('mousemove', function(e) {
-                eventX(e, slider, holder);
-            });
-            if(opts.splitReturn) {
-                slider.children[0].style.width = (100*opts.split) + '%';
-            }
+        slider.addEventListener('touchmove', function(e) {
+            eventX(e, slider, holder);
         });
 
-        slider.addEventListener('touchstart', function(evt) {
-            evt.target.addEventListener('touchmove', function(e) {
-                eventX(e, slider, holder);
+        if(opts.splitReturn) {
+            slider.addEventListener('mouseleave', function() {
+                split(slider.children[0],opts.split);
             });
-        });
-        slider.addEventListener('touchend', function(evt) {
-            evt.target.removeEventListener('touchmove', function(e) {
-                eventX(e, slider, holder);
+            slider.addEventListener('touchend', function() {
+                split(slider.children[0],opts.split);
             });
-            if(opts.splitReturn) {
-                slider.children[0].style.width = (100*opts.split) + '%';
-            }
-        });
+        }
     }
 
+    // collect and use x coordinate
     function eventX(e, slider, holder) {
         var clientX = e.touches?e.touches[0].clientX:e.clientX;
-
         slider.children[0].style.width = clientX - holder.offsetLeft + 'px';
+    }
+
+    // apply split width to element
+    function split(el,width) {
+        el.style.width = (100*width) + '%';
     }
 
     return {
