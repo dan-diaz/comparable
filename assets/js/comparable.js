@@ -4,28 +4,36 @@
 // dan-diaz.com
 var comparable = (function() {
 
-    function compare(selector, settings) {
+    var defaultSettings = {
+        split:0.5,
+        splitReturn:true,
+    }
+    var settings = defaultSettings;
+
+    function compare(selector, userSettings) {
+        //extend settings object
+		for (var key in userSettings) {
+			if (userSettings.hasOwnProperty(key) && userSettings[key] !== undefined) {
+				settings[key] = userSettings[key];
+			}
+		}
+
         var holders = document.querySelectorAll(selector);
-        var opts = {};
-        opts.split = settings&&settings.split!==null?settings.split:0.5;
-        opts.splitReturn = settings&&settings.splitReturn?settings.splitReturn:false;
-        opts.imageA = settings&&settings.imageA?settings.imageA:null;
-        opts.imageB = settings&&settings.imageB?settings.imageB:null;
 
         Array.prototype.forEach.call(holders, function(holder) {
             var compareA;
             var compareB;
 
-            if(opts.imageA !== null) {
-                compareA = opts.imageA;
+            if(settings.imageA !== null) {
+                compareA = settings.imageA;
             } else if(holder.dataset && holder.dataset.compareA !== null) {
                 compareA = holder.dataset.compareA;
             } else {
                 compareA = null;
             }
 
-            if(opts.imageB !== null) {
-                compareB = opts.imageB;
+            if(settings.imageB !== null) {
+                compareB = settings.imageB;
             } else if(holder.dataset && holder.dataset.compareB !== null) {
                 compareB = holder.dataset.compareB;
             } else {
@@ -35,16 +43,16 @@ var comparable = (function() {
             if(compareA === null || compareB === null) {
                 return false;
             } else {
-                var slider = createImg(compareA,compareB, holder, opts);
+                var slider = createImg(compareA,compareB, holder);
                 if(slider.children.length) {
-                    userEvents(slider, holder, opts);
+                    userEvents(slider, holder);
                 }
             }
         });
     }
 
     // set initial img attributes and styles
-    function createImg(a, b, holder, opts) {
+    function createImg(a, b, holder) {
         if(a!=='' && b!=='') {
             var compA = document.createElement('div');
             var compB = document.createElement('div');
@@ -75,8 +83,8 @@ var comparable = (function() {
             // Element-B inner slider
             compBSlider.className ='compare-b-slider';
             compBSlider.style.position = 'absolute';
-            // compBSlider.style.width = (100*opts.split) + '%';
-            split(compBSlider,opts.split);
+            // compBSlider.style.width = (100*settings.split) + '%';
+            split(compBSlider,settings.split);
             compBSlider.style.overflow = 'hidden';
 
             // image A - background image
@@ -105,7 +113,7 @@ var comparable = (function() {
     }
 
     // mouse and touch events
-    function userEvents(slider, holder, opts) {
+    function userEvents(slider, holder) {
         slider.addEventListener('mousemove', function(e) {
             eventX(e, slider, holder);
         });
@@ -114,12 +122,12 @@ var comparable = (function() {
             eventX(e, slider, holder);
         });
 
-        if(opts.splitReturn) {
+        if(settings.splitReturn) {
             slider.addEventListener('mouseleave', function() {
-                split(slider.children[0],opts.split);
+                split(slider.children[0],settings.split);
             });
             slider.addEventListener('touchend', function() {
-                split(slider.children[0],opts.split);
+                split(slider.children[0],settings.split);
             });
         }
     }
